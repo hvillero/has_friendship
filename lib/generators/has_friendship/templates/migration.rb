@@ -1,10 +1,10 @@
 class CreateFriendships < ActiveRecord::Migration
-  def self.up
+  def change
     create_table :friendships do |t|
       t.references :friendable, polymorphic: true
       t.integer  :friend_id
       t.string   :status
-      t.string   :friendships_type
+      t.string   :connection_type
       
       t.timestamps
     end

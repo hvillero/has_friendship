@@ -34,11 +34,11 @@ module HasFriendship
 
     module InstanceMethods
 
-      def friend_request(friend)
+      def friend_request(friend, connection_type: nil)
         unless self == friend || HasFriendship::Friendship.exist?(self, friend)
           transaction do
-            HasFriendship::Friendship.create(friendable_id: self.id, friendable_type: self.class.base_class.name, friend_id: friend.id, status: 'pending')
-            HasFriendship::Friendship.create(friendable_id: friend.id, friendable_type: friend.class.base_class.name, friend_id: self.id, status: 'requested')
+            HasFriendship::Friendship.create(friendable_id: self.id, friendable_type: self.class.base_class.name, friend_id: friend.id, status: 'pending', connection_type: connection_type)
+            HasFriendship::Friendship.create(friendable_id: friend.id, friendable_type: friend.class.base_class.name, friend_id: self.id, status: 'requested', connection_type: connection_type)
           end
         end
       end
