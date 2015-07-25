@@ -34,7 +34,7 @@ module HasFriendship
 
     module InstanceMethods
 
-      def friend_request(friend, connection_type: nil)
+      def friend_request(friend, connection_type = nil)
         unless self == friend || HasFriendship::Friendship.exist?(self, friend)
           transaction do
             HasFriendship::Friendship.create(friendable_id: self.id, friendable_type: self.class.base_class.name, friend_id: friend.id, status: 'pending', connection_type: connection_type)
