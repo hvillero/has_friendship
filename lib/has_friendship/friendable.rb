@@ -34,35 +34,39 @@ module HasFriendship
 
     module InstanceMethods
 
-      def friend_request(friend, connection_type = nil)
+      def friend_request(friend, options = {})
         unless self == friend || HasFriendship::Friendship.exist?(self, friend)
           transaction do
-            HasFriendship::Friendship.create(friendable_id: self.id, friendable_type: self.class.base_class.name, friend_id: friend.id, status: 'pending', connection_type: connection_type)
-            HasFriendship::Friendship.create(friendable_id: friend.id, friendable_type: friend.class.base_class.name, friend_id: self.id, status: 'requested', connection_type: connection_type)
+            HasFriendship::Friendship.create(friendable_id: self.id, friendable_type: self.class.base_class.name, 
+                                            friend_id: friend.id, status: 'pending', connection_type: options[:connection_type], requester_id: options[:requester_id])
+            HasFriendship::Friendship.create(friendable_id: friend.id, friendable_type: friend.class.base_class.name, 
+                                            friend_id: self.id, status: 'requested', connection_type: options[:connection_type], requester_id: options[:requester_id])
           end
         end
       end
 
-      def accept_request(friend)
+      def accept_request(friend, options = {})
         transaction do
           pending_friendship = HasFriendship::Friendship.find_friendship(friend, self)
           pending_friendship.status = 'accepted'
+          pending_friendship.approver_id = options[:approver_id]
           pending_friendship.save
 
           requeseted_friendship = HasFriendship::Friendship.find_friendship(self, friend)
+          pending_friendship.approver_id = options[:approver_id]
           requeseted_friendship.status = 'accepted'
           requeseted_friendship.save
         end
       end
 
-      def decline_request(friend)
+      def decline_request(friend, options = {})
         transaction do
           HasFriendship::Friendship.find_friendship(friend, self).destroy
           HasFriendship::Friendship.find_friendship(self, friend).destroy
         end
       end
 
-      def remove_friend(friend)
+      def remove_friend(friend, options = {})
         transaction do
           HasFriendship::Friendship.find_friendship(friend, self).destroy
           HasFriendship::Friendship.find_friendship(self, friend).destroy
