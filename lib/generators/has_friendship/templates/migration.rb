@@ -4,7 +4,7 @@ class CreateFriendships < ActiveRecord::Migration
       t.references :friendable, polymorphic: true
       t.integer  :friend_id
       t.integer  :requestor_id
-      t.integer  :approver_user_id
+      t.integer  :approver_id
       t.string   :status
       t.string   :connection_type
       
