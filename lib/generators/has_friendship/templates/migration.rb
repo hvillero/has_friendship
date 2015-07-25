@@ -4,6 +4,7 @@ class CreateFriendships < ActiveRecord::Migration
       t.references :friendable, polymorphic: true
       t.integer  :friend_id
       t.string   :status
+      t.string   :friendships_type
       
       t.timestamps
     end
