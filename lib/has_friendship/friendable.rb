@@ -76,7 +76,18 @@ module HasFriendship
       def friends_with?(friend)
         HasFriendship::Friendship.where(friendable_id: self.id, friend_id: friend.id, status: 'accepted').present?
       end
-
+      
+      def friends_with_connetion_type(connection_type)
+        HasFriendship::Friendship.where(friendable_id: self.id, connection_type: connection_type)
+      end
+      
+      def friends_with_requester(requester_id)
+        HasFriendship::Friendship.where(friendable_id: self.id, requester_id: requester_id)
+      end
+      
+      def friends_with_:approver(approver_id)
+        HasFriendship::Friendship.where(friendable_id: self.id, approver_id: approver_id)
+      end
     end
   end
 end
