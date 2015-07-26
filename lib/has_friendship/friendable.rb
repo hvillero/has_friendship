@@ -85,7 +85,7 @@ module HasFriendship
         HasFriendship::Friendship.where(friendable_id: self.id, requester_id: requester_id)
       end
       
-      def friends_with_:approver(approver_id)
+      def friends_with_approver(approver_id)
         HasFriendship::Friendship.where(friendable_id: self.id, approver_id: approver_id)
       end
     end
