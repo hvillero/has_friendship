@@ -22,6 +22,11 @@ module HasFriendship
                   -> { where friendships: { status: 'pending' } },
                   through: :friendships,
                   source: :friend
+                  
+        has_many :friends_with_connetion_type,
+                  -> (connetion_type) { where friendships: { connetion_type: connetion_type } },
+                            through: :friendships,
+                            source: :friend
 
         def self.friendable?
           true
@@ -77,9 +82,9 @@ module HasFriendship
         HasFriendship::Friendship.where(friendable_id: self.id, friend_id: friend.id, status: 'accepted').present?
       end
       
-      def friends_with_connetion_type(connection_type)
-        HasFriendship::Friendship.where(friendable_id: self.id, connection_type: connection_type)
-      end
+      # def friends_with_connetion_type(connection_type)
+      #   HasFriendship::Friendship.where(friendable_id: self.id, connection_type: connection_type)
+      # end
       
       def friends_with_requester(requester_id)
         HasFriendship::Friendship.where(friendable_id: self.id, requester_id: requester_id)
