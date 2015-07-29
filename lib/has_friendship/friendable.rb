@@ -78,15 +78,15 @@ module HasFriendship
       end
       
       def friends_with_connetion_type(connection_type)
-        HasFriendship::Friendship.where(friendable_id: self.id, connection_type: connection_type)
+        self.class.where(id: HasFriendship::Friendship.where(friendable_id: self.id, connection_type: connection_type).pluck(:friendable_id))
       end
       
       def friends_with_requester(requester_id)
-        HasFriendship::Friendship.where(friendable_id: self.id, requester_id: requester_id)
+        self.class.where(id: HasFriendship::Friendship.where(friendable_id: self.id, requester_id: requester_id).pluck(:friendable_id))
       end
       
       def friends_with_approver(approver_id)
-        HasFriendship::Friendship.where(friendable_id: self.id, approver_id: approver_id)
+        self.class.where(id: HasFriendship::Friendship.where(friendable_id: self.id,  approver_id: approver_id).pluck(:friendable_id))
       end
     end
   end
