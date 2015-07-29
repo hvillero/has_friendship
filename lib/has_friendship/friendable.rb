@@ -53,7 +53,7 @@ module HasFriendship
           pending_friendship.save
 
           requeseted_friendship = HasFriendship::Friendship.find_friendship(self, friend)
-          pending_friendship.approver_id = options[:approver_id]
+          requeseted_friendship.approver_id = options[:approver_id]
           requeseted_friendship.status = 'accepted'
           requeseted_friendship.save
         end
