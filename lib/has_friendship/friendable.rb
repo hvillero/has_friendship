@@ -23,6 +23,17 @@ module HasFriendship
                   through: :friendships,
                   source: :friend
                   
+        has_many :declined_friends,
+                  -> { where friendships: { status: 'declined' } },
+                  through: :friendships,
+                  source: :friend
+
+        has_many :deleted_friends,
+                  -> { where friendships: { status: 'deleted' } },
+                  through: :friendships,
+                  source: :friend
+                  
+                  
         def self.friendable?
           true
         end
@@ -49,11 +60,11 @@ module HasFriendship
         transaction do
           pending_friendship = HasFriendship::Friendship.find_friendship(friend, self)
           pending_friendship.status = 'accepted'
-          pending_friendship.approver_id = options[:approver_id]
+          pending_friendship.replier_id = options[:replier_id]
           pending_friendship.save
 
           requeseted_friendship = HasFriendship::Friendship.find_friendship(self, friend)
-          requeseted_friendship.approver_id = options[:approver_id]
+          requeseted_friendship.replier_id = options[:replier_id]
           requeseted_friendship.status = 'accepted'
           requeseted_friendship.save
         end
@@ -61,16 +72,40 @@ module HasFriendship
 
       def decline_request(friend, options = {})
         transaction do
-          HasFriendship::Friendship.find_friendship(friend, self).destroy
-          HasFriendship::Friendship.find_friendship(self, friend).destroy
+          pending_friendship = HasFriendship::Friendship.find_friendship(friend, self)
+          pending_friendship.status = 'declined'
+          pending_friendship.replier_id = options[:replier_id]
+          pending_friendship.save
+
+          requeseted_friendship = HasFriendship::Friendship.find_friendship(self, friend)
+          requeseted_friendship.replier_id = options[:replier_id]
+          requeseted_friendship.status = 'declined'
+          requeseted_friendship.save
         end
+                #
+        #
+        # transaction do
+        #   HasFriendship::Friendship.find_friendship(friend, self).destroy
+        #   HasFriendship::Friendship.find_friendship(self, friend).destroy
+        #end
       end
 
       def remove_friend(friend, options = {})
         transaction do
-          HasFriendship::Friendship.find_friendship(friend, self).destroy
-          HasFriendship::Friendship.find_friendship(self, friend).destroy
+          pending_friendship = HasFriendship::Friendship.find_friendship(friend, self)
+          pending_friendship.status = 'deleted'
+          pending_friendship.replier_id = options[:replier_id]
+          pending_friendship.save
+
+          requeseted_friendship = HasFriendship::Friendship.find_friendship(self, friend)
+          requeseted_friendship.replier_id = options[:replier_id]
+          requeseted_friendship.status = 'deleted'
+          requeseted_friendship.save
         end
+        # transaction do
+        #   HasFriendship::Friendship.find_friendship(friend, self).destroy
+        #   HasFriendship::Friendship.find_friendship(self, friend).destroy
+        # end
       end
 
       def friends_with?(friend)
@@ -88,6 +123,10 @@ module HasFriendship
       def friends_with_approver(approver_id)
         self.class.where(id: HasFriendship::Friendship.where(friendable_id: self.id,  approver_id: approver_id).pluck(:friendable_id))
       end
+      
+      def friends_status_connections(status)
+        HasFriendship::Friendship.where(friendable_id: self.id,  status: status)
+      end  
     end
   end
 end
