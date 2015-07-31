@@ -5,8 +5,10 @@ class CreateFriendships < ActiveRecord::Migration
       t.integer  :friend_id
       t.integer  :requester_id
       t.integer  :replier_id
+      t.integer  :remover_id
       t.string   :status
       t.string   :connection_type
+      t.datetime :removed_at
       
       t.timestamps
     end
