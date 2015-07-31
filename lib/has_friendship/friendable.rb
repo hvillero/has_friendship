@@ -94,12 +94,12 @@ module HasFriendship
         transaction do
           pending_friendship = HasFriendship::Friendship.find_friendship(friend, self)
           pending_friendship.status = 'deleted'
-          pending_friendship.replier_id = options[:remover_id]
+          pending_friendship.remover_id = options[:remover_id]
           pending_friendship.removed_at = Time.now
           pending_friendship.save
 
           requeseted_friendship = HasFriendship::Friendship.find_friendship(self, friend)
-          requeseted_friendship.replier_id = options[:remover_id]
+          requeseted_friendship.remover_id = options[:remover_id]
           requeseted_friendship.removed_at = Time.now
           requeseted_friendship.status = 'deleted'
           requeseted_friendship.save
