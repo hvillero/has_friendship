@@ -31,8 +31,8 @@ module HasFriendship
       end
     end
 
-    def self.find_friendship(friendable, friend)
-      find_by(friendable_id: friendable.id, friendable_type: friendable.class.base_class.name, friend_id: friend.id)
+    def self.find_friendship(friendable, friend, status)
+      find_by(friendable_id: friendable.id, friendable_type: friendable.class.base_class.name, friend_id: friend.id, status: status)
     end
   end
 end

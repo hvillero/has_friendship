@@ -59,35 +59,40 @@ module HasFriendship
       end
 
       def accept_request(friend, options = {})
-        transaction do
-          pending_friendship = HasFriendship::Friendship.find_friendship(friend, self)
-          pending_friendship.status = 'accepted'
-          pending_friendship.friend_issuer_id = self.id
-          pending_friendship.user_replier_id = options[:user_replier_id]
-          pending_friendship.save
+        if HasFriendship::Friendship.find_friendship(self, friend, 'requested')
+          transaction do
+            pending_friendship = HasFriendship::Friendship.find_friendship(friend, self, 'pending')
+            pending_friendship.status = 'accepted'
+            pending_friendship.friend_issuer_id = self.id
+            pending_friendship.user_replier_id = options[:user_replier_id]
+            pending_friendship.save
 
-          requeseted_friendship = HasFriendship::Friendship.find_friendship(self, friend)
-          requeseted_friendship.user_replier_id = options[:user_replier_id]
-          requeseted_friendship.status = 'accepted'
-          requeseted_friendship.friend_issuer_id = self.id
-          requeseted_friendship.save
+            requeseted_friendship = HasFriendship::Friendship.find_friendship(self, friend, 'requested')
+            requeseted_friendship.user_replier_id = options[:user_replier_id]
+            requeseted_friendship.status = 'accepted'
+            requeseted_friendship.friend_issuer_id = self.id
+            requeseted_friendship.save
+          end
         end
       end
 
       def decline_request(friend, options = {})
-        transaction do
-          pending_friendship = HasFriendship::Friendship.find_friendship(friend, self)
-          pending_friendship.status = 'declined'
-          pending_friendship.friend_issuer_id = self.id
-          pending_friendship.user_replier_id = options[:user_replier_id]
-          pending_friendship.save
+        if HasFriendship::Friendship.find_friendship(self, friend, 'requested')
+          transaction do
+            pending_friendship = HasFriendship::Friendship.find_friendship(friend, self, 'pending')
+            pending_friendship.status = 'declined'
+            pending_friendship.friend_issuer_id = self.id
+            pending_friendship.user_replier_id = options[:user_replier_id]
+            pending_friendship.save
 
-          requeseted_friendship = HasFriendship::Friendship.find_friendship(self, friend)
-          requeseted_friendship.user_replier_id = options[:user_replier_id]
-          requeseted_friendship.status = 'declined'
-          requeseted_friendship.friend_issuer_id = self.id
-          requeseted_friendship.save
+            requeseted_friendship = HasFriendship::Friendship.find_friendship(self, friend, 'requested')
+            requeseted_friendship.user_replier_id = options[:user_replier_id]
+            requeseted_friendship.status = 'declined'
+            requeseted_friendship.friend_issuer_id = self.id
+            requeseted_friendship.save
+          end
         end
+
         #
         #
         # transaction do
@@ -97,21 +102,24 @@ module HasFriendship
       end
 
       def remove_friend(friend, options = {})
-        transaction do
-          pending_friendship = HasFriendship::Friendship.find_friendship(friend, self)
-          pending_friendship.status = 'deleted'
-          pending_friendship.user_remover_id = options[:user_remover_id]
-          pending_friendship.removed_at = Time.now
-          pending_friendship.friend_issuer_id = self.id
-          pending_friendship.save
+        if HasFriendship::Friendship.find_friendship(self, friend, ['pending', 'accepted'])
+          transaction do
+            pending_friendship = HasFriendship::Friendship.find_friendship(friend, self, ['pending', 'accepted'])
+            pending_friendship.status = 'deleted'
+            pending_friendship.user_remover_id = options[:user_remover_id]
+            pending_friendship.removed_at = Time.now
+            pending_friendship.friend_issuer_id = self.id
+            pending_friendship.save
 
-          requeseted_friendship = HasFriendship::Friendship.find_friendship(self, friend)
-          requeseted_friendship.user_remover_id = options[:user_remover_id]
-          requeseted_friendship.removed_at = Time.now
-          requeseted_friendship.status = 'deleted'
-          requeseted_friendship.friend_issuer_id = self.id
-          requeseted_friendship.save
+            requeseted_friendship = HasFriendship::Friendship.find_friendship(self, friend, ['pending', 'accepted'])
+            requeseted_friendship.user_remover_id = options[:user_remover_id]
+            requeseted_friendship.removed_at = Time.now
+            requeseted_friendship.status = 'deleted'
+            requeseted_friendship.friend_issuer_id = self.id
+            requeseted_friendship.save
+          end
         end
+
         # transaction do
         #   HasFriendship::Friendship.find_friendship(friend, self).destroy
         #   HasFriendship::Friendship.find_friendship(self, friend).destroy
