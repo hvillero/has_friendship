@@ -100,18 +100,18 @@ module HasFriendship
         #   HasFriendship::Friendship.find_friendship(self, friend).destroy
         #end
       end
-
+      
       def remove_friend(friend, options = {})
         if HasFriendship::Friendship.find_friendship(self, friend, ['pending', 'accepted'])
           transaction do
-            pending_friendship = HasFriendship::Friendship.find_friendship(friend, self, ['pending', 'accepted'])
+            pending_friendship = HasFriendship::Friendship.find_friendship(self, friend, ['pending', 'accepted'])
             pending_friendship.status = 'deleted'
             pending_friendship.user_remover_id = options[:user_remover_id]
             pending_friendship.removed_at = Time.now
             pending_friendship.friend_issuer_id = self.id
             pending_friendship.save
 
-            requeseted_friendship = HasFriendship::Friendship.find_friendship(self, friend, ['pending', 'accepted'])
+            requeseted_friendship = HasFriendship::Friendship.find_friendship(friend, self, ['requested', 'accepted'])
             requeseted_friendship.user_remover_id = options[:user_remover_id]
             requeseted_friendship.removed_at = Time.now
             requeseted_friendship.status = 'deleted'
