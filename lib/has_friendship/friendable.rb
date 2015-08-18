@@ -131,15 +131,15 @@ module HasFriendship
       end
 
       def friends_with_connetion_type(connection_type)
-        self.class.where(id: HasFriendship::Friendship.where(friendable_id: self.id, connection_type: connection_type).pluck(:friend_id))
+        self.class.where(id: HasFriendship::Friendship.where(friendable_id: self.id, connection_type: connection_type, status: 'accepted').pluck(:friend_id))
       end
 
       def friends_with_requester(requester_id)
-        self.class.where(id: HasFriendship::Friendship.where(friendable_id: self.id, requester_id: requester_id).pluck(:friend_id))
+        self.class.where(id: HasFriendship::Friendship.where(friendable_id: self.id, requester_id: requester_id, status: 'accepted').pluck(:friend_id))
       end
 
       def friends_with_approver(approver_id)
-        self.class.where(id: HasFriendship::Friendship.where(friendable_id: self.id,  approver_id: approver_id).pluck(:friend_id))
+        self.class.where(id: HasFriendship::Friendship.where(friendable_id: self.id,  approver_id: approver_id, status: 'accepted').pluck(:friend_id))
       end
 
       def friends_status_connections(status)
