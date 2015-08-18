@@ -146,12 +146,20 @@ module HasFriendship
         HasFriendship::Friendship.where(friendable_id: self.id,  status: status)
       end
 
-      def suggestions_with_degree_2_ext(connection_type)
+      def suggestions_with_second_degree(connection_type)
         my_friends_ids = self.friends_with_connetion_type(connection_type).uniq.pluck(:id)
         friends_of_my_friends = HasFriendship::Friendship.where(friendable_id: my_friends_ids,  status: 'accepted').uniq.pluck(:friend_id)
         suggestions_ids =  (my_friends_ids - friends_of_my_friends) | (friends_of_my_friends - my_friends_ids)
         suggestions_ids.delete_if{|c| c == self.id || my_friends_ids.include?(c)}
         self.class.where(id: suggestions_ids)
+      end
+
+      def shared_connections(friend, connection_type='contact')
+        my_friends_ids = self.friends_with_connetion_type(connection_type).uniq.pluck(:id)
+        friends_of_my_friend = friend.friends_with_connetion_type(connection_type).uniq.pluck(:id)
+        common_friend_ids =  my_friends_ids & friends_of_my_friend
+        common_friend_ids.delete_if{|c| c == self.id || c == friend.id}
+        self.class.where(id: common_friend_ids)
       end
     end
   end
