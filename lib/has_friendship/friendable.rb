@@ -100,7 +100,7 @@ module HasFriendship
         #   HasFriendship::Friendship.find_friendship(self, friend).destroy
         #end
       end
-      
+
       def remove_friend(friend, options = {})
         if HasFriendship::Friendship.find_friendship(self, friend, ['pending', 'accepted'])
           transaction do
@@ -131,19 +131,27 @@ module HasFriendship
       end
 
       def friends_with_connetion_type(connection_type)
-        self.class.where(id: HasFriendship::Friendship.where(friendable_id: self.id, connection_type: connection_type).pluck(:friendable_id))
+        self.class.where(id: HasFriendship::Friendship.where(friendable_id: self.id, connection_type: connection_type).pluck(:friend_id))
       end
 
       def friends_with_requester(requester_id)
-        self.class.where(id: HasFriendship::Friendship.where(friendable_id: self.id, requester_id: requester_id).pluck(:friendable_id))
+        self.class.where(id: HasFriendship::Friendship.where(friendable_id: self.id, requester_id: requester_id).pluck(:friend_id))
       end
 
       def friends_with_approver(approver_id)
-        self.class.where(id: HasFriendship::Friendship.where(friendable_id: self.id,  approver_id: approver_id).pluck(:friendable_id))
+        self.class.where(id: HasFriendship::Friendship.where(friendable_id: self.id,  approver_id: approver_id).pluck(:friend_id))
       end
 
       def friends_status_connections(status)
         HasFriendship::Friendship.where(friendable_id: self.id,  status: status)
+      end
+
+      def suggestions_with_degree_2_ext(connection_type)
+        my_friends_ids = self.friends_with_connetion_type(connection_type).uniq.pluck(:id)
+        friends_of_my_friends = HasFriendship::Friendship.where(friendable_id: my_friends_ids,  status: 'accepted').uniq.pluck(:friend_id)
+        suggestions_ids =  (my_friends_ids - friends_of_my_friends) | (my_friends_ids - friends_of_my_friends)
+
+        self.class.where(id: suggestions_ids)
       end
     end
   end
