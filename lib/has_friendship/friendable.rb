@@ -149,8 +149,8 @@ module HasFriendship
       def suggestions_with_degree_2_ext(connection_type)
         my_friends_ids = self.friends_with_connetion_type(connection_type).uniq.pluck(:id)
         friends_of_my_friends = HasFriendship::Friendship.where(friendable_id: my_friends_ids,  status: 'accepted').uniq.pluck(:friend_id)
-        suggestions_ids =  (my_friends_ids - friends_of_my_friends) | (my_friends_ids - friends_of_my_friends)
-
+        suggestions_ids =  (my_friends_ids - friends_of_my_friends) | (friends_of_my_friends - my_friends_ids)
+        suggestions_ids.delete_if{|c| c == self.id || my_friends_ids.include?(c)}
         self.class.where(id: suggestions_ids)
       end
     end
