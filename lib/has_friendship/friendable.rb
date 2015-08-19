@@ -72,6 +72,7 @@ module HasFriendship
             requeseted_friendship.status = 'accepted'
             requeseted_friendship.friend_issuer_id = self.id
             requeseted_friendship.save
+            requeseted_friendship
           end
         end
       end
@@ -92,13 +93,6 @@ module HasFriendship
             requeseted_friendship.save
           end
         end
-
-        #
-        #
-        # transaction do
-        #   HasFriendship::Friendship.find_friendship(friend, self).destroy
-        #   HasFriendship::Friendship.find_friendship(self, friend).destroy
-        #end
       end
 
       def remove_friend(friend, options = {})
@@ -119,11 +113,6 @@ module HasFriendship
             requeseted_friendship.save
           end
         end
-
-        # transaction do
-        #   HasFriendship::Friendship.find_friendship(friend, self).destroy
-        #   HasFriendship::Friendship.find_friendship(self, friend).destroy
-        # end
       end
 
       def friends_with?(friend)
